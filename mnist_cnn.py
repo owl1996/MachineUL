@@ -22,9 +22,9 @@ train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_wo
 test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=0)
 
 # 4. Définir le modèle de réseau neuronal
-class MNIST_Net(nn.Module):
+class ConvNet(nn.Module):
     def __init__(self):
-        super(MNIST_Net, self).__init__()
+        super(ConvNet, self).__init__()
         # Convolutional layers
         self.conv1 = nn.Conv2d(1, 32, kernel_size=3)
         self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
@@ -43,7 +43,7 @@ class MNIST_Net(nn.Module):
         return F.log_softmax(x, dim=1)
 
 # 5. Initialiser le modèle, la fonction de perte et l'optimiseur
-model = MNIST_Net()
+model = ConvNet()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 criterion = nn.CrossEntropyLoss()
 
