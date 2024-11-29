@@ -74,7 +74,7 @@ def filter_loaders(loaders, excluded_classes, batch_size, shuffle=True, num_work
     
     # Créer un nouveau DataLoader avec les indices filtrés
     if dataset is not None:
-        combined_loader = DataLoader(Subset(dataset, filtered_indices), batch_size=loader.batch_size, shuffle=shuffle, num_workers=num_workers)
+        combined_loader = DataLoader(Subset(dataset, filtered_indices), batch_size=batch_size, shuffle=shuffle, num_workers=num_workers)
         return combined_loader
     else:
         return None
