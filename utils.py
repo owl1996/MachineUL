@@ -1,3 +1,6 @@
+import torch
+import torch.nn as nn
+import random
 from torch.utils.data import DataLoader, Subset
 
 def loaders_by_classes(dataset, batch_size, shuffle=True, num_workers=0):
@@ -35,6 +38,17 @@ def balance(loaders):
         class_counts[class_name] = len(loader.dataset)
 
     return class_counts
+
+def balanced_batch_size(loaders, class_name):
+    bal = balance(loaders)
+    n_items_class = bal[class_name]
+    n_tot = 0
+    for key, val in bal.items():
+        if key != class_name:
+            n_tot += val
+    proportion = n_items_class / n_tot
+    balcd_batch_size = (1 - proportion) / proportion
+    return balcd_batch_size
 
 def filter_loaders(loaders, excluded_classes, batch_size, shuffle=True, num_workers=0):
     """
@@ -81,3 +95,78 @@ def get_logits(class_name, model, loaders, device):
         output = model(data)  # Calculer les logits pour ce batch
 
     return output  # Retourne les logits pour le batch sélectionné
+
+
+def submodel(model, class_num):
+    """
+    Crée un sous-modèle basé sur le modèle donné en omettant une classe spécifique,
+    sans dépendre des noms explicites des couches.
+    
+    Args:
+        model: Modèle PyTorch à modifier.
+        class_num: Numéro de la classe à omettre.
+        
+    Returns:
+        Nouveau modèle avec une sortie réduite.
+    """
+    # Identifier automatiquement le nombre de classes en inspectant la dernière couche
+    last_layer_name = None
+    last_layer = None
+    for name, module in model.named_modules():
+        if isinstance(module, nn.Linear):  # Cherche la dernière couche linéaire
+            last_layer_name = name
+            last_layer = module
+
+    if last_layer is None:
+        raise ValueError("Aucune couche linéaire trouvée dans le modèle.")
+    
+    original_num_classes = last_layer.out_features
+    if class_num < 0 or class_num >= original_num_classes:
+        raise ValueError(f"Le numéro de classe doit être compris entre 0 et {original_num_classes - 1}.")
+    
+    # Créer une copie du modèle
+    new_model = type(model)()  # Initialise un nouveau modèle de même type
+    new_model.load_state_dict(model.state_dict())  # Copie les poids existants
+
+    # Modifier la dernière couche linéaire pour avoir une sortie de taille réduite
+    new_last_layer = nn.Linear(last_layer.in_features, original_num_classes - 1)
+    
+    # Copier les poids et biais de l'ancienne couche, en omettant `class_num`
+    old_weights = last_layer.weight.data.clone()
+    old_bias = last_layer.bias.data.clone()
+    new_last_layer.weight.data = torch.cat((old_weights[:class_num], old_weights[class_num + 1:]), dim=0)
+    new_last_layer.bias.data = torch.cat((old_bias[:class_num], old_bias[class_num + 1:]), dim=0)
+
+    # Remplacer dynamiquement la dernière couche dans le modèle
+    parent_module = new_model
+    *parent_path, layer_to_replace = last_layer_name.split(".")
+    for part in parent_path:
+        parent_module = getattr(parent_module, part)
+    setattr(parent_module, layer_to_replace, new_last_layer)
+
+    return new_model
+
+def get_activations(model, input_tensor, layer_num, verbose=True):
+    """
+    Get the internal representation of input tensor at after the layer 'layer_num'
+    """
+    
+    layers = list(model.children())
+    layer = layers[layer_num]
+
+    if verbose:
+        print(f'Checking residues of the input after layer : {layer}')
+
+    # Variable pour stocker les activations
+    activations = None
+
+    # Hook pour capturer les activations
+    def hook_fn(module, input, output):
+        nonlocal activations
+        activations = output
+
+    handle = layer.register_forward_hook(hook_fn)
+    output = model(input_tensor)
+    handle.remove()
+
+    return {'output' : output, 'activations' : activations}
