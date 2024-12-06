@@ -9,13 +9,11 @@ Machine-UL/
   
   requirements.txt  # Les dépendances Python
   
-  src/              # Code source des modèles et attaques
+  unlearning/   # Implémentations des méthodes de unlearning
   
-       models/       # Modèles ML
-       
-       attacks/      # Implémentations des attaques
-       
-       unlearning/   # Implémentations des méthodes de unlearning
+  evaluations/      # Implémentations des Evaluation Metrics
+
+  models/       # Modèles ML
         
   benchmarks/       # Scripts pour évaluer les performances des techniques
   
