@@ -1,7 +1,7 @@
 import torch
 import matplotlib.pyplot as plt
 
-def sample_pre_softmax(class_name, model, loaders, device):
+def sample_pre_softmax(class_name, model, loaders, device, grad = True):
     logits = None  # Variable locale pour stocker les logits
 
     # Définir la fonction hook pour capturer les logits avant le softmax
@@ -21,8 +21,11 @@ def sample_pre_softmax(class_name, model, loaders, device):
     data = data.to(device)  # Envoyer les données sur le device
 
     # Passer les données à travers le modèle pour obtenir les logits
-    with torch.no_grad():
-        _ = model(data)  # Les logits seront capturés dans hook_fn
+    if grad:
+        _ = model(data)
+    else:
+        with torch.no_grad():
+            _ = model(data)  # Les logits seront capturés dans hook_fn
 
     # Retirer le hook une fois terminé
     hook.remove()
@@ -54,7 +57,7 @@ def fast_normalization_method(class_name, model, loaders, device):
     mean_excluded = torch.mean(output_excluded, dim=1, keepdim=True)
     # Soustraction de la moyenne
     normalized_output = output_excluded - mean_excluded
-    return normalized_output.cpu()
+    return normalized_output, output_excluded
 
 def normalization_method(class_name, model, loaders, device):
     outputs = sample_all_pre_softmax(model, loaders, device)

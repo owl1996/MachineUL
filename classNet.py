@@ -23,5 +23,16 @@ class ConvNet(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
+class SondeNet(nn.Module):
+    def __init__(self):
+        super(SondeNet, self).__init__()
+        # Fully connected layers
+        self.fc1 = nn.Linear(128, 256)
+        self.fc2 = nn.Linear(256, 10)
+        self.fc3 = nn.Linear(10, 1)
 
-
+    def forward(self, x):
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.sigmoid(self.fc3(x))
+        return x
