@@ -7,7 +7,7 @@
         <mxCell id="2_yW2Nsnx3Mgd4jrPGsD-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;$$f_{\theta}$$&lt;/div&gt;" vertex="1">
           <mxGeometry height="40" width="40" x="320" y="280" as="geometry" />
         </mxCell>
-        <mxCell id="2_yW2Nsnx3Mgd4jrPGsD-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;$$f_{\theta_u}\simeq f_{\theta^\star}$$&lt;/div&gt;" vertex="1">
+        <mxCell id="2_yW2Nsnx3Mgd4jrPGsD-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;$$f_{\theta_u}\approx f_{\theta^\star}$$&lt;/div&gt;" vertex="1">
           <mxGeometry height="40" width="80" x="480" y="280" as="geometry" />
         </mxCell>
         <mxCell id="2_yW2Nsnx3Mgd4jrPGsD-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;div&gt;$$M$$&lt;/div&gt;" vertex="1">
